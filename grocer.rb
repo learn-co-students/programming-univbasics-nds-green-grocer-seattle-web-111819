@@ -91,6 +91,7 @@ def consolidate_cart(cart)
     if coupons.length == 0
       return cart
     end
+
     coupon_applied_cart = []
 
     i=0
@@ -111,24 +112,30 @@ def consolidate_cart(cart)
   end
 
 
+def discount(cart_item)
+  discounted = (cart_item[:price] * 0.8).round(2)
+  return discounted
+end
+
+
 def apply_clearance(cart)
   # Consult README for inputs and outputs
   #
   # REMEMBER: This method **should** update cart
 
   i=0
-  clearance_prices = []
+  while i<cart.length do
+    if cart[i][:clearance] == true
+      clearance_price= discount(cart[i])
+      cart[i][:price] = clearance_price
+    end
+    i +=1
+  end
 
-  while i <cart.length do
-    cart_price=cart[:price]
-    if cart[:clearance] = true
-      cart_price_updated = cart_price*0.8
-    clearance_prices.push(cart_price_updated)
-    i+=1
-  end
-  end
-  clearance_prices
+  return cart
 end
+
+
 
 def checkout(cart, coupons)
   # Consult README for inputs and outputs
