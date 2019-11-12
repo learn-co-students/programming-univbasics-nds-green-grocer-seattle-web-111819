@@ -1,26 +1,133 @@
+# require 'pp'
+#require 'pry'
+
+
 def find_item_by_name_in_collection(name, collection)
   # Implement me first!
   #
   # Consult README for inputs and outputs
+  # Returns a matching hash if a match is found between the desired name and a given hash's item key
+i=0
+  while i< collection.length do
+    if name==collection[i][:item]
+      return collection[i]
+    end
+    i+= 1
+  end
+  return nil
 end
 
+def find_item_index_by_name_in_collection(name, collection)
+
+  # Returns a matching hash's INDEX if a match is found between the desired name and a given hash's item key
+i=0
+  while i< collection.length do
+    if name==collection[i][:item]
+      return i
+    end
+    i+= 1
+  end
+  return nil
+end
+
+def add_count_key_to_item_hash(item_hash)
+  {
+    :item => item_hash[:item],
+    :price => item_hash[:price],
+    :clearance => item_hash[:clearance],
+    :count => 1
+  }
+end
+
+
 def consolidate_cart(cart)
+
+
   # Consult README for inputs and outputs
   #
   # REMEMBER: This returns a new Array that represents the cart. Don't merely
   # change `cart` (i.e. mutate) it. It's easier to return a new thing.
-end
+  new_consolidated_cart=[]
+  i=0
 
-def apply_coupons(cart, coupons)
-  # Consult README for inputs and outputs
-  #
-  # REMEMBER: This method **should** update cart
-end
+    while i< cart.length do
+
+    old_item_hash = cart[i]
+    new_item_hash_index = find_item_index_by_name_in_collection(old_item_hash[:item],new_consolidated_cart)
+      if new_item_hash_index != nil #if returns true, aka, it has a match and already exists in new_consolidated_cart, increase the count by 1
+        new_consolidated_cart[new_item_hash_index][:count] +=1
+      else
+        #new_consolidated_cart<<cart[i] #if it returns false, add hash item to new_consolidated_cart and add a count key with value of 1
+        new_consolidated_cart<<add_count_key_to_item_hash(old_item_hash)
+      end
+      i+=1
+    end
+    new_consolidated_cart
+  end
+
+
+
+  # to update keys and values after coupon is confirmed
+  def update_coupon_item_hash(item_hash, coupon_item_hash)
+    {
+      :item => item_hash[:item] + ' W/COUPON',
+      :price => coupon_item_hash[:cost] / coupon_item_hash[:num],
+      :clearance => item_hash[:clearance],
+      :count => coupon_item_hash[:num]
+    }
+  end
+
+  # makes a new item and updates the original cart item count
+  def update_original_cart_item_count(item_hash, coupon_item_hash)
+    {
+      :item => item_hash[:item],
+      :price => item_hash[:price],
+      :clearance => item_hash[:clearance],
+      :count => item_hash[:count] - coupon_item_hash[:num]
+    }
+  end
+
+  def apply_coupons(cart, coupons)
+    if coupons.length == 0
+      return cart
+    end
+    coupon_applied_cart = []
+
+    i=0
+    while i<coupons.length do
+      j=0
+      while j<cart.length do
+        if coupons[i][:item] == cart[j][:item] && cart[j][:count] >= coupons[i][:num]
+          coupon_applied_cart<< update_coupon_item_hash(cart[j], coupons[i])
+          coupon_applied_cart<< update_original_cart_item_count(cart[j],coupons[i])
+
+        end
+        j +=1
+      end
+      i +=1
+    end
+
+    return coupon_applied_cart
+  end
+
 
 def apply_clearance(cart)
   # Consult README for inputs and outputs
   #
   # REMEMBER: This method **should** update cart
+
+  i=0
+  clearance_prices = []
+
+  while i <cart.length do
+    cart_price=cart[:price]
+    if cart[:clearance] = true
+      cart_price_updated = cart_price*0.8
+    clearance_prices.push(cart_price_updated)
+    i+=1
+  end
+  end
+  clearance_prices
 end
 
 def checkout(cart, coupons)
@@ -33,4 +140,6 @@ def checkout(cart, coupons)
   #
   # BEFORE it begins the work of calculating the total (or else you might have
   # some irritated customers
+
+
 end
