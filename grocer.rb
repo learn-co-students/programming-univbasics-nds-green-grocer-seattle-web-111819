@@ -92,24 +92,22 @@ def consolidate_cart(cart)
       return cart
     end
 
-    coupon_applied_cart = []
 
     i=0
     while i<coupons.length do
       j=0
       while j<cart.length do
         if coupons[i][:item] == cart[j][:item] && cart[j][:count] >= coupons[i][:num]
-          coupon_applied_cart<< update_coupon_item_hash(cart[j], coupons[i])
-          coupon_applied_cart<< update_original_cart_item_count(cart[j],coupons[i])
-        else
-          coupon_applied_cart<<cart[j]
+          cart << update_coupon_item_hash(cart[j], coupons[i])
+          cart[j][:count] = cart[j][:count] - coupons[i][:num]
+          # coupon_applied_cart<< update_original_cart_item_count(cart[j],coupons[i])
         end
         j +=1
       end
       i +=1
     end
 
-    return coupon_applied_cart
+    return cart
   end
 
 
@@ -149,17 +147,26 @@ def checkout(cart, coupons)
   #
   # BEFORE it begins the work of calculating the total (or else you might have
   # some irritated customers
-
-
-  cart_consolidated = consolidate_cart(cart)
-  coupons_consolidated_cart = apply_coupons(cart_consolidated, coupons)
-  cheapest_cart = apply_clearance(coupons_consolidated_cart)
-
   puts "cart"
   puts cart
 
   puts "coupons"
   puts coupons
+
+  cart_consolidated = consolidate_cart(cart)
+
+  puts "consolidate_cart result:"
+  puts cart_consolidated
+
+  coupons_consolidated_cart = apply_coupons(cart_consolidated, coupons)
+
+  puts "apply_coupons result:"
+  puts coupons_consolidated_cart
+
+  cheapest_cart = apply_clearance(coupons_consolidated_cart)
+  puts "apply_clearance result:"
+  puts cheapest_cart
+
 
   cart_total = 0
   i=0
@@ -173,6 +180,8 @@ def checkout(cart, coupons)
     final_discount = (cart_total * 0.9).round(2)
     return final_discount
   else
+    puts "cart total before return:"
+    puts cart_total
     return cart_total
   end
 
