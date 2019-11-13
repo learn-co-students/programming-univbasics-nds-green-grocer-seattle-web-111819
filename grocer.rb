@@ -101,7 +101,8 @@ def consolidate_cart(cart)
         if coupons[i][:item] == cart[j][:item] && cart[j][:count] >= coupons[i][:num]
           coupon_applied_cart<< update_coupon_item_hash(cart[j], coupons[i])
           coupon_applied_cart<< update_original_cart_item_count(cart[j],coupons[i])
-
+        else
+          coupon_applied_cart<<cart[j]
         end
         j +=1
       end
@@ -138,6 +139,7 @@ end
 
 
 def checkout(cart, coupons)
+
   # Consult README for inputs and outputs
   #
   # This method should call
@@ -148,5 +150,30 @@ def checkout(cart, coupons)
   # BEFORE it begins the work of calculating the total (or else you might have
   # some irritated customers
 
+
+  cart_consolidated = consolidate_cart(cart)
+  coupons_consolidated_cart = apply_coupons(cart_consolidated, coupons)
+  cheapest_cart = apply_clearance(coupons_consolidated_cart)
+
+  puts "cart"
+  puts cart
+
+  puts "coupons"
+  puts coupons
+
+  cart_total = 0
+  i=0
+  while i<cheapest_cart.length do
+    cart_total += cheapest_cart[i][:price] * cheapest_cart[i][:count]
+
+    i +=1
+  end
+
+  if cart_total >= 100
+    final_discount = (cart_total * 0.9).round(2)
+    return final_discount
+  else
+    return cart_total
+  end
 
 end
